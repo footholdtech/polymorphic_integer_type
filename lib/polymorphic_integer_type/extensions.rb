@@ -9,15 +9,14 @@ module PolymorphicIntegerType
 
       def belongs_to(name, scope = nil, **options)
         options = scope if scope.kind_of? Hash
-        integer_type = options.delete :integer_type
         super
-        if options[:polymorphic] && (integer_type || options[:polymorphic].is_a?(Hash))
+        if options[:polymorphic] && (options[:integer_type] || options[:polymorphic].is_a?(Hash))
           mapping =
-            case integer_type
+            case options[:integer_type]
             when true then PolymorphicIntegerType::Mapping[name]
             when nil then options[:polymorphic]
             else
-              raise ArgumentError, "Unknown integer_type value: #{integer_type.inspect}"
+              raise ArgumentError, "Unknown integer_type value: #{options[:integer_type].inspect}"
             end.dup
 
           foreign_type = reflections[name.to_s].foreign_type
