@@ -21,14 +21,18 @@ namespace :db do
   desc "Create the database"
   task :create do
     ActiveRecord::Base.establish_connection(admin_database_config)
-    ActiveRecord::Base.connection.create_database(database_config.fetch(:database))
     puts "Database created."
   end
 
   desc "Migrate the database"
   task :migrate do
     ActiveRecord::Base.establish_connection(database_config)
-    ActiveRecord::Migrator.migrate(migration_path)
+    if defined?(ActiveRecord::MigrationContext)
+      migration_context = ActiveRecord::MigrationContext.new(migration_path, ActiveRecord::SchemaMigration)
+      migration_context.migrate
+    else
+      ActiveRecord::Migrator.migrate(migration_path)
+    end
     Rake::Task["db:schema"].invoke
     puts "Database migrated."
   end
@@ -36,7 +40,8 @@ namespace :db do
   desc "Drop the database"
   task :drop do
     ActiveRecord::Base.establish_connection(admin_database_config)
-    ActiveRecord::Base.connection.drop_database(database_config.fetch(:database))
+    db_file = database_config.fetch(:database)
+    File.delete(db_file) if File.exist?(db_file)
     puts "Database deleted."
   end
 
