@@ -13,6 +13,7 @@ require 'support/drink'
 require 'support/profile'
 require 'support/profile_history'
 require 'support/namespaced_activity'
+require 'support/place'
 require 'byebug'
 require 'pry'
 

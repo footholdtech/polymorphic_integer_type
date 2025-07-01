@@ -179,6 +179,7 @@ describe PolymorphicIntegerType do
       end
     end
   end
+
   context "When a link is given polymorphic record" do
     let(:link) { Link.create(source: source) }
     let(:source) { cat }
@@ -190,6 +191,17 @@ describe PolymorphicIntegerType do
 
       include_examples "proper source"
       include_examples "proper target"
+    end
+  end
+
+  context "When a link is given polymorphic record via a non-integer type association" do
+    let(:link) { Link.create(legacy_source: source) }
+    let(:source) { Place.create(name: "Main Street") }
+
+    it "appropriately sets the source_id and source_type to the polymorphic_name" do
+      expect(link.legacy_source_id).to eql source.id
+      expect(link.legacy_source_type).to eql Place.polymorphic_name
+      expect(link.legacy_source).to eql source
     end
   end
 
